@@ -123,7 +123,7 @@ extension NSURLRequest
     func getNFXURL() -> String
     {
         if (URL != nil) {
-            return URL!.absoluteString;
+            return URL!.absoluteString!;
         } else {
             return "-"
         }

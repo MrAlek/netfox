@@ -40,10 +40,10 @@ class NFXListController: NFXGenericController, UITableViewDelegate, UITableViewD
         self.tableView.registerClass(NFXListCell.self, forCellReuseIdentifier: NSStringFromClass(NFXListCell))
         
         if NFX.sharedInstance().getSelectedGesture() ~= .custom {
-            self.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Done, target: NFX.sharedInstance(), action: Selector("hide"))
+            self.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Done, target: NFX.sharedInstance(), action: #selector(NFX.hide))
         }
         
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage.NFXSettings(), style: .Plain, target: self, action: Selector("settingsButtonPressed"))
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage.NFXSettings(), style: .Plain, target: self, action: #selector(NFXListController.settingsButtonPressed))
 
         let searchView = UIView()
         searchView.frame = CGRectMake(0, 0, CGRectGetWidth(self.view.frame) - 60, 0)
@@ -68,13 +68,13 @@ class NFXListController: NFXGenericController, UITableViewDelegate, UITableViewD
 
         NSNotificationCenter.defaultCenter().addObserver(
             self,
-            selector: "reloadData",
+            selector: #selector(NFXGenericController.reloadData),
             name: "NFXReloadData",
             object: nil)
         
         NSNotificationCenter.defaultCenter().addObserver(
             self,
-            selector: "deactivateSearchController",
+            selector: #selector(NFXListController.deactivateSearchController),
             name: "NFXDeactivateSearch",
             object: nil)
     }
