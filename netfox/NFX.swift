@@ -170,8 +170,7 @@ public class NFX: NSObject
     
     private var presentingViewController: UIViewController?
     {
-        let rootViewController = UIApplication.sharedApplication().keyWindow?.rootViewController
-        return rootViewController?.presentedViewController ?? rootViewController
+        return UIApplication.sharedApplication().keyWindow?.topViewController
     }
     
     private func hideNFX()
@@ -227,3 +226,19 @@ public class NFX: NSObject
         return self.filters
     }
 }
+
+private extension UIWindow
+{
+    var topViewController: UIViewController
+    {
+        var topViewController = rootViewController!
+        
+        while let viewController = topViewController.presentedViewController
+        {
+            topViewController = viewController
+        }
+        
+        return topViewController
+    }
+}
+
