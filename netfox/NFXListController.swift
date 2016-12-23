@@ -26,30 +26,30 @@ class NFXListController: NFXGenericController, UITableViewDelegate, UITableViewD
     {
         super.viewDidLoad()
         
-        self.edgesForExtendedLayout = .None
+        self.edgesForExtendedLayout = UIRectEdge()
         self.extendedLayoutIncludesOpaqueBars = false
         self.automaticallyAdjustsScrollViewInsets = false
         
         self.tableView.frame = self.view.frame
-        self.tableView.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
+        self.tableView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         self.tableView.translatesAutoresizingMaskIntoConstraints = true
         self.tableView.delegate = self
         self.tableView.dataSource = self
         self.view.addSubview(self.tableView)
         
-        self.tableView.registerClass(NFXListCell.self, forCellReuseIdentifier: NSStringFromClass(NFXListCell))
+        self.tableView.register(NFXListCell.self, forCellReuseIdentifier: NSStringFromClass(NFXListCell.self))
         
         if NFX.sharedInstance().getSelectedGesture() ~= .custom {
-            self.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Done, target: NFX.sharedInstance(), action: #selector(NFX.hide))
+            self.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: NFX.sharedInstance(), action: #selector(NFX.hide))
         }
         
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage.NFXSettings(), style: .Plain, target: self, action: #selector(NFXListController.settingsButtonPressed))
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage.NFXSettings(), style: .plain, target: self, action: #selector(NFXListController.settingsButtonPressed))
 
         let searchView = UIView()
-        searchView.frame = CGRectMake(0, 0, CGRectGetWidth(self.view.frame) - 60, 0)
-        searchView.autoresizingMask = [.FlexibleWidth]
+        searchView.frame = CGRect(x: 0, y: 0, width: self.view.frame.width - 60, height: 0)
+        searchView.autoresizingMask = [.flexibleWidth]
         searchView.autoresizesSubviews = true
-        searchView.backgroundColor = UIColor.clearColor()
+        searchView.backgroundColor = UIColor.clear
         
         self.searchController = UISearchController(searchResultsController: nil)
         self.searchController.searchResultsUpdater = self
@@ -57,29 +57,29 @@ class NFXListController: NFXGenericController, UITableViewDelegate, UITableViewD
         self.searchController.hidesNavigationBarDuringPresentation = false
         self.searchController.dimsBackgroundDuringPresentation = false
         searchView.addSubview(self.searchController.searchBar)
-        self.searchController.searchBar.autoresizingMask = [.FlexibleWidth]
+        self.searchController.searchBar.autoresizingMask = [.flexibleWidth]
         self.searchController.searchBar.sizeToFit()
-        self.searchController.searchBar.backgroundColor = UIColor.clearColor()
-        self.searchController.searchBar.searchBarStyle = .Minimal
+        self.searchController.searchBar.backgroundColor = UIColor.clear
+        self.searchController.searchBar.searchBarStyle = .minimal
         searchView.frame = self.searchController.searchBar.frame
-        self.searchController.view.backgroundColor = UIColor.clearColor()
+        self.searchController.view.backgroundColor = UIColor.clear
         
         self.navigationItem.titleView = searchView
 
-        NSNotificationCenter.defaultCenter().addObserver(
+        NotificationCenter.default.addObserver(
             self,
             selector: #selector(NFXGenericController.reloadData),
-            name: "NFXReloadData",
+            name: NSNotification.Name(rawValue: "NFXReloadData"),
             object: nil)
         
-        NSNotificationCenter.defaultCenter().addObserver(
+        NotificationCenter.default.addObserver(
             self,
             selector: #selector(NFXListController.deactivateSearchController),
-            name: "NFXDeactivateSearch",
+            name: NSNotification.Name(rawValue: "NFXDeactivateSearch"),
             object: nil)
     }
     
-    override func viewWillAppear(animated: Bool)
+    override func viewWillAppear(_ animated: Bool)
     {
         super.viewWillAppear(animated)
         reloadData()
@@ -94,7 +94,7 @@ class NFXListController: NFXGenericController, UITableViewDelegate, UITableViewD
     
     // MARK: UISearchResultsUpdating
     
-    func updateSearchResultsForSearchController(searchController: UISearchController)
+    func updateSearchResults(for searchController: UISearchController)
     {
         let predicateURL = NSPredicate(format: "requestURL contains[cd] '\(searchController.searchBar.text!)'")
         let predicateMethod = NSPredicate(format: "requestMethod contains[cd] '\(searchController.searchBar.text!)'")
@@ -104,32 +104,32 @@ class NFXListController: NFXGenericController, UITableViewDelegate, UITableViewD
         
         let searchPredicate = NSCompoundPredicate(orPredicateWithSubpredicates: predicates)
         
-        let array = (NFXHTTPModelManager.sharedInstance.getModels() as NSArray).filteredArrayUsingPredicate(searchPredicate)
+        let array = (NFXHTTPModelManager.sharedInstance.getModels() as NSArray).filtered(using: searchPredicate)
         self.filteredTableData = array as! [NFXHTTPModel]
         reloadData()
     }
     
     func deactivateSearchController()
     {
-        self.searchController.active = false
+        self.searchController.isActive = false
     }
     
     // MARK: UITableViewDataSource
     
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int
     {
-        if (self.searchController.active) {
+        if (self.searchController.isActive) {
             return self.filteredTableData.count
         } else {
             return NFXHTTPModelManager.sharedInstance.getModels().count
         }
     }
     
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell
     {
-        let cell = self.tableView.dequeueReusableCellWithIdentifier(NSStringFromClass(NFXListCell), forIndexPath: indexPath) as! NFXListCell
+        let cell = self.tableView.dequeueReusableCell(withIdentifier: NSStringFromClass(NFXListCell.self), for: indexPath) as! NFXListCell
         
-        if (self.searchController.active) {
+        if (self.searchController.isActive) {
             if self.filteredTableData.count > 0 {
                 let obj = self.filteredTableData[indexPath.row]
                 cell.configForObject(obj)
@@ -144,30 +144,30 @@ class NFXListController: NFXGenericController, UITableViewDelegate, UITableViewD
         return cell
     }
     
-    func tableView(tableView: UITableView, viewForFooterInSection section: Int) -> UIView?
+    func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView?
     {
-        return UIView.init(frame: CGRectZero)
+        return UIView.init(frame: CGRect.zero)
     }
     
     override func reloadData()
     {
-        dispatch_async(dispatch_get_main_queue()) { () -> Void in
+        DispatchQueue.main.async { () -> Void in
             self.tableView.reloadData()
             self.tableView.setNeedsDisplay()
         }
     }
     
-    func numberOfSectionsInTableView(tableView: UITableView) -> Int
+    func numberOfSections(in tableView: UITableView) -> Int
     {
         return 1
     }
     
-    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath)
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath)
     {
         var detailsController : NFXDetailsController
         detailsController = NFXDetailsController()
         var model: NFXHTTPModel
-        if (self.searchController.active) {
+        if (self.searchController.isActive) {
             model = self.filteredTableData[indexPath.row]
         } else {
             model = NFXHTTPModelManager.sharedInstance.getModels()[indexPath.row]
@@ -177,7 +177,7 @@ class NFXListController: NFXGenericController, UITableViewDelegate, UITableViewD
         
     }
     
-    func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat
     {
         return 58
     }
